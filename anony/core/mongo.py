@@ -301,11 +301,11 @@ class MongoDB:
     
         musers, mchats = [], []
         seen_users, seen_chats = set(), set()
-    
+        
         async for u in self.db.tgusersdb.find():
             try:
-                uid = int(u["user_id"]) if isinstance(u.get("_id"), ObjectId) else int(u["_id"])
-            except (TypeError, ValueError, KeyError):
+                uid = int(u.get("user_id"))
+            except (TypeError, ValueError):
                 continue
     
             if uid not in seen_users:
@@ -314,8 +314,11 @@ class MongoDB:
     
         async for u in self.usersdb.find():
             try:
-                uid = int(u["_id"])
-            except (TypeError, ValueError, KeyError):
+                if isinstance(u.get("_id"), ObjectId):
+                    uid = int(u.get("user_id"))
+                else:
+                    uid = int(u.get("_id"))
+            except (TypeError, ValueError):
                 continue
     
             if uid not in seen_users:
@@ -324,13 +327,17 @@ class MongoDB:
     
         await self.usersdb.drop()
         await self.db.tgusersdb.drop()
+    
         if musers:
             await self.usersdb.insert_many(musers)
     
         async for c in self.chatsdb.find():
             try:
-                cid = int(c["chat_id"]) if isinstance(c.get("_id"), ObjectId) else int(c["_id"])
-            except (TypeError, ValueError, KeyError):
+                if isinstance(c.get("_id"), ObjectId):
+                    cid = int(c.get("chat_id"))
+                else:
+                    cid = int(c.get("_id"))
+            except (TypeError, ValueError):
                 continue
     
             if cid not in seen_chats:
@@ -338,6 +345,7 @@ class MongoDB:
                 mchats.append({"_id": cid})
     
         await self.chatsdb.drop()
+    
         if mchats:
             await self.chatsdb.insert_many(mchats)
     
