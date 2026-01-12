@@ -303,13 +303,21 @@ class MongoDB:
         seen_users, seen_chats = set(), set()
     
         async for u in self.db.tgusersdb.find():
-            uid = int(u.get("user_id")) if isinstance(u.get("_id"), ObjectId) else int(u["_id"])
+            try:
+                uid = int(u["user_id"]) if isinstance(u.get("_id"), ObjectId) else int(u["_id"])
+            except (TypeError, ValueError, KeyError):
+                continue
+    
             if uid not in seen_users:
                 seen_users.add(uid)
                 musers.append({"_id": uid})
     
         async for u in self.usersdb.find():
-            uid = int(u["_id"])
+            try:
+                uid = int(u["_id"])
+            except (TypeError, ValueError, KeyError):
+                continue
+    
             if uid not in seen_users:
                 seen_users.add(uid)
                 musers.append({"_id": uid})
@@ -320,7 +328,11 @@ class MongoDB:
             await self.usersdb.insert_many(musers)
     
         async for c in self.chatsdb.find():
-            cid = int(c.get("chat_id")) if isinstance(c.get("_id"), ObjectId) else int(c["_id"])
+            try:
+                cid = int(c["chat_id"]) if isinstance(c.get("_id"), ObjectId) else int(c["_id"])
+            except (TypeError, ValueError, KeyError):
+                continue
+    
             if cid not in seen_chats:
                 seen_chats.add(cid)
                 mchats.append({"_id": cid})
@@ -331,6 +343,7 @@ class MongoDB:
     
         await self.cache.insert_one({"_id": "migrated"})
         logger.info("Migration completed successfully.")
+
 
 
     async def load_cache(self) -> None:
