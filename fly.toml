@@ -1,13 +1,11 @@
 app = "anonxmusic-7684pw"
 primary_region = "iad"
 
-# حذفنا قسم [http_service] بالكامل لأنه ملوش لازمة في البوتات
-
+# أمر التشغيل يعتمد على الدوكر مباشرة
 [processes]
-  app = "" 
-  # السطر ده معناه: شغل الأمر الموجود في Dockerfile (CMD) مباشرة
+  app = ""
 
 [[vm]]
   cpu_kind = "shared"
-  cpus = 1
-  memory_mb = 1024
+  cpus = 2           # خليتها 2 كور عشان تستحمل الرامات العالية
+  memory_mb = 5120   # 5 جيجا (الكمبيوتر بيحسب الـ 5000 كـ 5120 ميجا)
