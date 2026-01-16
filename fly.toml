@@ -1,0 +1,13 @@
+app = "anonxmusic-7684pw"
+primary_region = "iad"
+
+# حذفنا قسم [http_service] بالكامل لأنه ملوش لازمة في البوتات
+
+[processes]
+  app = "" 
+  # السطر ده معناه: شغل الأمر الموجود في Dockerfile (CMD) مباشرة
+
+[[vm]]
+  cpu_kind = "shared"
+  cpus = 1
+  memory_mb = 1024
